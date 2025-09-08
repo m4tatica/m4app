@@ -1,0 +1,9 @@
+nohup: ignoring input
+Conexão com PostgreSQL estabelecida com sucesso.
+Tabelas verificadas/criadas com sucesso.
+Dados iniciais inseridos/verificados com sucesso.
+Servidor rodando na porta 3000
+Conexão com PostgreSQL estabelecida com sucesso.
+Conexão com PostgreSQL estabelecida com sucesso.
+Recebido SIGTERM, fechando servidor...
+Servidor fechado.
