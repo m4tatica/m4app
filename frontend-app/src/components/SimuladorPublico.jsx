@@ -99,22 +99,24 @@ const SimuladorPublico = () => {
       return;
     }
 
-    let texto = `🔫 *${nomeProduto}*\n`;
-    texto += `💰 *Valor à vista: R$ ${parseFloat(valorProduto).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}*\n\n`;
-    texto += `📊 *Simulação de Parcelamento:*\n\n`;
+    let texto = `M4 Tática\n`;
+    texto += `${nomeProduto} - R$ ${parseFloat(valorProduto).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} à vista\n`;
+    texto += `Opções de Pagamento:\n`;
 
     resultados.forEach(resultado => {
-      const valorTotal = resultado.valorTotalParcelado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      const valorParcela = resultado.valorDaParcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const valorTotal = resultado.valorTotalParcelado.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const valorParcela = resultado.valorDaParcela.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       
-      if (resultado.numeroParcelas === 1) {
-        texto += `${resultado.parcela_tipo}: R$ ${valorTotal}\n`;
+      if (resultado.parcela_tipo === 'Pix' || resultado.parcela_tipo === 'Débito') {
+        texto += `${resultado.parcela_tipo} R$ ${valorTotal}\n`;
+      } else if (resultado.numeroParcelas === 1) {
+        texto += `${resultado.parcela_tipo} R$ ${valorTotal}\n`;
       } else {
         texto += `${resultado.parcela_tipo}: ${resultado.numeroParcelas}x R$ ${valorParcela} = R$ ${valorTotal}\n`;
       }
     });
 
-    texto += `\n💬 Entre em contato para mais informações!`;
+    texto += `\nOs valores poderão sofrer alterações sem aviso prévio`;
 
     navigator.clipboard.writeText(texto).then(() => {
       toast.success('Texto copiado para a área de transferência!');

@@ -19,18 +19,21 @@ const CalculadoraPrecificacao = () => {
     ipiValor: '',
     ipiTipo: 'percentual',
     frete: '',
-    difalPercent: ''
+    difalPercent: '',
+    impostoVendaPercent: '',
+    margemLucroTipo: 'percentual',
+    margemLucroValor: ''
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validar campos obrigatórios
-    const camposObrigatorios = ['nomeProduto', 'precoCompra', 'descontoFornecedorPercent', 'ipiValor', 'frete', 'difalPercent'];
-    const campoVazio = camposObrigatorios.find(campo => !formData[campo] && formData[campo] !== '0');
+    const camposObrigatorios = ["nomeProduto", "precoCompra", "descontoFornecedorPercent", "ipiValor", "frete", "difalPercent", "impostoVendaPercent", "margemLucroValor"];
+    const campoVazio = camposObrigatorios.find(campo => !formData[campo] && formData[campo] !== "0");
     
     if (campoVazio) {
-      toast.error('Preencha todos os campos');
+      toast.error("Preencha todos os campos");
       return;
     }
 
@@ -44,7 +47,10 @@ const CalculadoraPrecificacao = () => {
         ipiValor: parseFloat(formData.ipiValor),
         ipiTipo: formData.ipiTipo,
         frete: parseFloat(formData.frete),
-        difalPercent: parseFloat(formData.difalPercent)
+        difalPercent: parseFloat(formData.difalPercent),
+        impostoVendaPercent: parseFloat(formData.impostoVendaPercent),
+        margemLucroTipo: formData.margemLucroTipo,
+        margemLucroValor: parseFloat(formData.margemLucroValor)
       };
 
       const response = await precificacaoService.calcular(dadosParaEnvio);
@@ -175,6 +181,21 @@ const CalculadoraPrecificacao = () => {
               </div>
 
               <div>
+                <Label htmlFor="impostoVenda">Imposto de Venda (%)</Label>
+                <Input
+                  id="impostoVenda"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={formData.impostoVendaPercent}
+                  onChange={(e) => setFormData({ ...formData, impostoVendaPercent: e.target.value })}
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+
+              <div>
                 <Label htmlFor="difal">DIFAL (%)</Label>
                 <Input
                   id="difal"
@@ -187,6 +208,50 @@ const CalculadoraPrecificacao = () => {
                   placeholder="0.00"
                   required
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="margemLucroTipo">Tipo de Margem/Lucro</Label>
+                  <Select value={formData.margemLucroTipo} onValueChange={(value) => setFormData({ ...formData, margemLucroTipo: value, margemLucroValor: '' })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="percentual">Margem (%)</SelectItem>
+                      <SelectItem value="lucro_alvo">Lucro Alvo (R$)</SelectItem>
+                      <SelectItem value="preco_final">Preço Final (R$)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="margemLucroValor">
+                    {formData.margemLucroTipo === 'percentual' && 'Margem de Lucro (%)'}
+                    {formData.margemLucroTipo === 'lucro_alvo' && 'Lucro Alvo (R$)'}
+                    {formData.margemLucroTipo === 'preco_final' && 'Preço Final (R$)'}
+                  </Label>
+                  {formData.margemLucroTipo === 'percentual' ? (
+                    <Input
+                      id="margemLucroValor"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      value={formData.margemLucroValor}
+                      onChange={(e) => setFormData({ ...formData, margemLucroValor: e.target.value })}
+                      placeholder="0.00"
+                      required
+                    />
+                  ) : (
+                    <CurrencyInput
+                      value={formData.margemLucroValor}
+                      onValueChange={(value) => setFormData({ ...formData, margemLucroValor: value || '' })}
+                      placeholder="R$ 0,00"
+                      required
+                    />
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-2">

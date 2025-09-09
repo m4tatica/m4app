@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 // URL base da API backend
-const API_BASE_URL = 'https://3000-i48nl2p0opalpv18o6z7z-771ac5b9.manus.computer/api';
+const API_BASE_URL = '/api';
 
 // Criar instância do axios
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
