@@ -5,7 +5,7 @@ const API_BASE_URL = 'https://3000-i48nl2p0opalpv18o6z7z-771ac5b9.manus.computer
 
 // Criar instância do axios
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },

@@ -184,7 +184,7 @@ const SimuladorPublico = () => {
                     <SelectValue placeholder="Selecione um produto..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Produto personalizado</SelectItem>
+                    <SelectItem value="custom">Produto personalizado</SelectItem>
                     {produtos.map(produto => (
                       <SelectItem key={produto.codigo_produto} value={produto.codigo_produto}>
                         {produto.nome_produto}
