@@ -1,8 +1,12 @@
+// backend_project/index.js
+
 const express = require("express");
-const bodyParser = require("body-parser");
+const bodyParser = require("body-parser"); // body-parser está incluso no express moderno, mas mantemos por consistência.
 const cors = require("cors");
 const path = require("path");
 const { initializeDatabase } = require("./src/models/init");
+
+// Importando as rotas
 const taxasRoutes = require("./src/routes/taxas");
 const authRoutes = require("./src/routes/auth");
 const produtosRoutes = require("./src/routes/produtos");
@@ -10,57 +14,36 @@ const precificacaoRoutes = require("./src/routes/precificacao");
 const simuladorRoutes = require("./src/routes/simulador");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Configurar CORS
+// Middlewares
 app.use(cors());
+app.use(express.json()); // Usando o parser de JSON nativo do Express
 
-app.use(bodyParser.json());
-
-// Servir arquivos estáticos do frontend
+// --- CORREÇÃO PRINCIPAL ---
+// Servir os arquivos estáticos (build do frontend) da pasta 'public'
+// Esta linha é crucial e deve vir ANTES da rota catch-all ('*').
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rotas da API
-app.use("/api", taxasRoutes);
-app.use("/api", authRoutes);
-app.use("/api", produtosRoutes);
-app.use("/api", precificacaoRoutes);
-app.use("/api", simuladorRoutes);
+// Inicializa o banco de dados (pode ser importante para Vercel estabelecer a conexão)
+initializeDatabase().catch(error => {
+  console.error('Falha ao inicializar o banco de dados na inicialização:', error);
+});
 
-// Rota catch-all para SPA (Single Page Application)
+// Rotas da API - Ajustadas para serem mais explícitas
+// Agora cada conjunto de rotas tem seu próprio prefixo.
+app.use("/api/taxas", taxasRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/produtos", produtosRoutes);
+app.use("/api/precificacao", precificacaoRoutes);
+app.use("/api/simulador", simuladorRoutes);
+
+// Rota catch-all para servir a Single Page Application (SPA)
+// Se nenhuma rota de API ou arquivo estático for encontrado, ele serve a página principal do React.
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-async function startServer() {
-  try {
-    await initializeDatabase();
-    const server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Servidor rodando na porta ${PORT}`);
-    });
-    
-    // Manter o servidor rodando
-    process.on('SIGTERM', () => {
-      console.log('Recebido SIGTERM, fechando servidor...');
-      server.close(() => {
-        console.log('Servidor fechado.');
-        process.exit(0);
-      });
-    });
-    
-    process.on('SIGINT', () => {
-      console.log('Recebido SIGINT, fechando servidor...');
-      server.close(() => {
-        console.log('Servidor fechado.');
-        process.exit(0);
-      });
-    });
-    
-  } catch (error) {
-    console.error('Erro ao iniciar servidor:', error);
-    process.exit(1);
-  }
-}
-
-startServer();
-
+// --- ESSENCIAL PARA VERCEL ---
+// Em vez de app.listen(), exportamos o 'app' para que a Vercel possa
+// usá-lo como uma função serverless.
+module.exports = app;
